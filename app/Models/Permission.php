@@ -25,4 +25,9 @@ class Permission extends Model
     protected $casts = [
         'status' => 'boolean',
     ];
+
+    public function roles()
+    {
+        return $this->hasMany(Role::class, 'permission_id');
+    }
 }

@@ -25,4 +25,9 @@ class Role extends Model
     protected $casts = [
         'status' => 'boolean',
     ];
+
+    public function permissions()
+    {
+        return $this->belongsTo(Permission::class, 'permission_id');
+    }
 }
