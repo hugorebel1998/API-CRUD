@@ -10,10 +10,10 @@ Route::group(['prefix' => 'usuarios', 'namespace' => 'Usuarios'], function () {
         'uses' => 'UserController@listar'
     ]);
 
-    // Route::get('/{usuario}', [
-    //     'middleware' => 'auth:api',
-    //     'uses' => 'UserController@listar'
-    // ]);
+    Route::get('/{usuario}/mostrar', [
+        'middleware' => 'auth:api',
+        'uses' => 'UserController@listar'
+    ]);
 
     Route::post('/crear', [
         'middleware' => 'auth:api',
