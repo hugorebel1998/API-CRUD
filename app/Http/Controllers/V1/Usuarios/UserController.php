@@ -22,6 +22,7 @@ class UserController extends Controller
             'nombre' => 'required',
             'apellidos' => 'required',
             'correo_electronico' => 'required|email|unique:users,correo_electronico',
+            'celular' => 'required|min:10|max:10',
             'fotografia' => 'required|mimes:jpeg,jpg,png|max:10000',
             'contrasena' => 'required',
             'tipo_usuario'  => 'required'
@@ -44,6 +45,7 @@ class UserController extends Controller
             'nombre' => $inputs['nombre'],
             'apellidos' => $inputs['apellidos'],
             'correo_electronico' => $inputs['correo_electronico'],
+            'celular' => $inputs['celular'],
             'fotografia' => isset($inputs['fotografia']) ? $inputs['fotografia'] : null,
             'contrasena' => $inputs['contrasena'],
             'rol_id' => $tipo_usuario
@@ -64,6 +66,7 @@ class UserController extends Controller
             'nombre' => 'sometimes',
             'apellidos' => 'sometimes',
             'correo_electronico' => 'sometimes|email|unique:users,correo_electronico,' . $usuario->id,
+            'celular' => 'sometimes',
             'fotografia' => 'sometimes|mimes:jpeg,jpg,png|max:10000',
             'contrasena' => 'sometimes',
             'tipo_usuario'  => 'sometimes'
@@ -86,6 +89,7 @@ class UserController extends Controller
             'nombre' => isset($inputs['nombre']) ? $inputs['nombre'] : $usuario['nombre'],
             'apellidos' => isset($inputs['apellidos']) ? $inputs['apellidos'] : $usuario['apellidos'],
             'correo_electronico' => isset($inputs['correo_electronico']) ? $inputs['correo_electronico'] : $usuario['correo_electronico'],
+            'celular' => isset($inputs['celular']) ? $inputs['celular'] : $usuario,
             'fotografia' =>  isset($inputs['fotografia']) ? $inputs['fotografia'] : $usuario['fotografia'],
             'contrasena' => isset($inputs['contrasena']) ? $inputs['contrasena'] : $usuario['contrasena'],
             'rol_id' => isset($tipo_usuario) ? $tipo_usuario : $usuario['rol_id']

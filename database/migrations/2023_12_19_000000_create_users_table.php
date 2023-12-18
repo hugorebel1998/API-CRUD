@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nombre');
             $table->string('apellidos');
             $table->string('correo_electronico')->unique();
+            $table->string('celular');
             $table->string('fotografia')->nullable();
             $table->string('contrasena');
             $table->unsignedBigInteger('rol_id')->nullable();
