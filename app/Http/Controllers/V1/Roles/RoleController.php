@@ -9,6 +9,13 @@ use Illuminate\Http\Request;
 
 class RoleController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     * 
+     * @param int|null $usuario_id
+     * 
+     * @return [type]
+     */
     public function listar(int $role = null)
     {
         if (empty($role))
@@ -17,6 +24,12 @@ class RoleController extends Controller
         return Role::findOrFail($role);
     }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function crear(Request $request)
     {
         $inputs = $this->validate($request, [
@@ -35,6 +48,13 @@ class RoleController extends Controller
         ], 200);
     }
 
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     *  @param mixed $role_id
+     * @return \Illuminate\Http\Response
+     */
     public function update(Request $request, $role_id)
     {
         $role = Role::findOrFail($role_id);
@@ -57,6 +77,13 @@ class RoleController extends Controller
         ], 200);
     }
 
+    /**
+     * Asignar un permiso a un rol.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     *  @param mixed $role_id
+     * @return \Illuminate\Http\Response
+     */
     public function asignarPermiso(Request $request, $role_id)
     {
         $role = Role::findOrFail($role_id);
@@ -64,7 +91,7 @@ class RoleController extends Controller
         // Obtener los permisos seleccionados desde la solicitud
         $selectedPermissions = $request->input('permiso', []);
 
-        // Obtener los modelos de permisos asociados a los ID seleccionados
+        // Obtener los modelos de permisos asociados a los nombres seleccionados
         $permissions = Permission::where('nombre', $selectedPermissions)->get();
 
         // Asignar permisos al rol

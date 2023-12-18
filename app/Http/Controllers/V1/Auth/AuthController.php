@@ -11,6 +11,12 @@ use Illuminate\Support\Facades\Hash;
 class AuthController extends Controller
 {
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function register(Request $request)
     {
         $inputs = $this->validate($request, [
@@ -58,6 +64,12 @@ class AuthController extends Controller
         ], 200);
     }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function login(Request $request)
     {
         $inputs = $this->validate($request, [
@@ -79,6 +91,12 @@ class AuthController extends Controller
         ], 200);
     }
 
+    /**
+     * Remove the specified resource from storage.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function logout(Request $request)
     {
         $request->user()->token()->revoke();
