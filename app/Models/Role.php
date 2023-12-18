@@ -26,6 +26,11 @@ class Role extends Model
         'status' => 'boolean',
     ];
 
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
+
     public function permissions()
     {
         return $this->belongsToMany(Permission::class);

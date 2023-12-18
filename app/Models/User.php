@@ -45,4 +45,9 @@ class User extends Authenticatable
     protected $casts = [
         'contrasena' => 'hashed',
     ];
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'rol_id');
+    }
 }

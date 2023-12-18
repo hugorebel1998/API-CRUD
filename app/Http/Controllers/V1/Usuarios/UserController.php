@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Auth;
+
 
 class UserController extends Controller
 {
@@ -20,6 +22,12 @@ class UserController extends Controller
      */
     public function listar(int $usuario_id = null)
     {
+        $user = Auth::user();
+
+        if (!in_array($user->role->nombre, ['Administrador', 'Basico']))
+            return response()->json(['success' => false, 'message' => 'No tienes los permisos necesarios'], 400);
+
+        // El usuario tiene permisos, devolver la lista de usuarios
         if (empty($usuario_id))
             return User::all();
         return User::findOrFail($usuario_id);
@@ -33,6 +41,11 @@ class UserController extends Controller
      */
     public function crear(Request $request)
     {
+        $user = Auth::user();
+
+        if ($user->role->nombre !== 'Administrador')
+            return response()->json(['success' => false, 'message' => 'No tienes los permisos necesarios'], 400);
+
         $inputs = $this->validate($request, [
             'nombre' => 'required',
             'apellidos' => 'required',
@@ -82,6 +95,11 @@ class UserController extends Controller
      */
     public function update(Request $request, $usuario_id)
     {
+        $user = Auth::user();
+
+        if (!in_array($user->role->nombre, ['Administrador', 'Basico']))
+            return response()->json(['success' => false, 'message' => 'No tienes los permisos necesarios'], 400);
+
         $usuario = User::findOrFail($usuario_id);
 
         $inputs = $this->validate($request, [
@@ -133,6 +151,11 @@ class UserController extends Controller
      */
     public function delete($usuario_id)
     {
+        $user = Auth::user();
+
+        if ($user->role->nombre !== 'Administrador')
+            return response()->json(['success' => false, 'message' => 'No tienes los permisos necesarios'], 400);
+
         $usuario = User::findOrFail($usuario_id);
         $usuario->delete();
 
@@ -147,6 +170,11 @@ class UserController extends Controller
      */
     public function restablecer($usuario_id)
     {
+        $user = Auth::user();
+
+        if ($user->role->nombre !== 'Administrador')
+            return response()->json(['success' => false, 'message' => 'No tienes los permisos necesarios'], 400);
+
         $usuario = User::find($usuario_id);
         User::onlyTrashed()->findOrFail($usuario_id)->restore();
 
@@ -159,6 +187,11 @@ class UserController extends Controller
      */
     public function reporte()
     {
+        $user = Auth::user();
+
+        if ($user->role->nombre !== 'Administrador')
+            return response()->json(['success' => false, 'message' => 'No tienes los permisos necesarios'], 400);
+
         $usuarios = User::all();
 
         $filePath = storage_path('app/reportes/reportes-usuarios.pdf');

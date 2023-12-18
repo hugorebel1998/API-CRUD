@@ -26,7 +26,7 @@ Route::group(['prefix' => 'roles', 'namespace' => 'Roles'], function () {
     ]);
 
     Route::post('/asignar-permisos/{role}', [
-        // 'middleware' => 'auth:api',
+        'middleware' => 'auth:api',
         'uses' => 'RoleController@asignarPermiso'
     ]);
 });
