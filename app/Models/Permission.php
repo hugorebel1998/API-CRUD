@@ -26,8 +26,8 @@ class Permission extends Model
         'status' => 'boolean',
     ];
 
-    public function roles()
-    {
-        return $this->hasMany(Role::class, 'permission_id');
-    }
+    // public function roles()
+    // {
+    //     return $this->belongsTo(Role::class);
+    // }
 }
