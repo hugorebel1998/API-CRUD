@@ -9,9 +9,9 @@ Route::group(['prefix' => 'usuarios', 'namespace' => 'Usuarios'], function () {
         'uses' => 'UserController@listar'
     ]);
 
-    Route::get('/{usuario}', [
-        'uses' => 'UserController@listar'
-    ]);
+    // Route::get('/{usuario}', [
+    //     'uses' => 'UserController@listar'
+    // ]);
 
     Route::post('/crear', [
         'uses' => 'UserController@crear'
@@ -27,5 +27,9 @@ Route::group(['prefix' => 'usuarios', 'namespace' => 'Usuarios'], function () {
 
     Route::get('/restablecer/{usuario}', [
         'uses' => 'UserController@restablecer'
+    ]);
+
+    Route::get('/reporte', [
+        'uses' => 'UserController@reporte'
     ]);
 });

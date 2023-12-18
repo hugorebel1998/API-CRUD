@@ -6,9 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\File;
 
 class UserController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     * 
+     * @param int|null $usuario_id
+     * 
+     * @return [type]
+     */
     public function listar(int $usuario_id = null)
     {
         if (empty($usuario_id))
@@ -16,6 +25,12 @@ class UserController extends Controller
         return User::findOrFail($usuario_id);
     }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function crear(Request $request)
     {
         $inputs = $this->validate($request, [
@@ -58,6 +73,13 @@ class UserController extends Controller
         ], 200);
     }
 
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     *  @param mixed $usuario_id
+     * @return \Illuminate\Http\Response
+     */
     public function update(Request $request, $usuario_id)
     {
         $usuario = User::findOrFail($usuario_id);
@@ -102,6 +124,13 @@ class UserController extends Controller
         ], 200);
     }
 
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $usuario
+     * @return \Illuminate\Http\Response
+     */
     public function delete($usuario_id)
     {
         $usuario = User::findOrFail($usuario_id);
@@ -110,11 +139,36 @@ class UserController extends Controller
         return response()->json(['success' => true, 'message' => 'Usuario eliminado con éxito'], 200);
     }
 
+    /**
+     * Reset the specified resource from storage.
+     *
+     * @param  int  $usuario
+     * @return \Illuminate\Http\Response
+     */
     public function restablecer($usuario_id)
     {
         $usuario = User::find($usuario_id);
         User::onlyTrashed()->findOrFail($usuario_id)->restore();
 
         return response()->json(['success' => true, 'message' => 'Usuario se restablecio con éxito'], 200);
+    }
+
+    /**
+     * Generate a report
+     * @return [type]
+     */
+    public function reporte()
+    {
+        $usuarios = User::all();
+
+        $filePath = storage_path('app/reportes/reportes-usuarios.pdf');
+
+        File::makeDirectory(dirname($filePath), 0777, true, true);
+
+        $pdf = PDF::loadView('reporte_pdf', ['usuarios' => $usuarios]);
+        $pdf->save($filePath);
+
+        $url = url('/storage/reportes/reportes-usuarios.pdf');
+        return response()->json(['mensaje' => 'El reporte ha sido generado y se encuentra disponible en: ' . $url]);
     }
 }
