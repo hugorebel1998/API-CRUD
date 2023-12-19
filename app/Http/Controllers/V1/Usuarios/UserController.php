@@ -56,6 +56,7 @@ class UserController extends Controller
             'tipo_usuario'  => 'required'
         ]);
 
+
         // Se obtiene los roles
         $tipo_usuario = Role::where('nombre', 'like', '%' . $inputs['tipo_usuario'] . '%')->pluck('id')->first();
 
@@ -95,25 +96,25 @@ class UserController extends Controller
      */
     public function update(Request $request, $usuario_id)
     {
-        $user = Auth::user();
+        $usuario_db = User::findOrFail($usuario_id);
 
-        if (!in_array($user->role->nombre, ['Administrador', 'Basico']))
-            return response()->json(['success' => false, 'message' => 'No tienes los permisos necesarios'], 400);
-
-        $usuario = User::findOrFail($usuario_id);
-
-        $inputs = $this->validate($request, [
+        $usuario = $this->validate($request, [
             'nombre' => 'sometimes',
             'apellidos' => 'sometimes',
-            'correo_electronico' => 'sometimes|email|unique:users,correo_electronico,' . $usuario->id,
+            'correo_electronico' => 'sometimes|email|unique:users,correo_electronico,' . $usuario_db->id,
             'celular' => 'sometimes',
             'fotografia' => 'sometimes|mimes:jpeg,jpg,png|max:10000',
             'contrasena' => 'sometimes',
             'tipo_usuario'  => 'sometimes'
         ]);
 
+        $user = Auth::user();
+
+        if (!in_array($user->role->nombre, ['Administrador', 'Basico']))
+            return response()->json(['success' => false, 'message' => 'No tienes los permisos necesarios'], 400);
+
         //Se obtiene los roles
-        $tipo_usuario = Role::where('nombre', 'like', '%' . $inputs['tipo_usuario'] . '%')->pluck('id')->first();
+        $tipo_usuario = Role::where('nombre', 'like', '%' . $usuario['tipo_usuario'] . '%')->pluck('id')->first();
 
         if (!$tipo_usuario)
             return response()->json(['success' => false, 'message' => 'El tipo de usuario no exite'], 404);
@@ -122,23 +123,19 @@ class UserController extends Controller
             $nombre_imagen = $archivo->getClientOriginalName();
             $ruta = public_path('img/products/');
             $archivo->move($ruta, $nombre_imagen);
-            $inputs['fotografia'] = $nombre_imagen;
+            $usuario['fotografia'] = $nombre_imagen;
         }
 
-        $usuario->update([
-            'nombre' => isset($inputs['nombre']) ? $inputs['nombre'] : $usuario['nombre'],
-            'apellidos' => isset($inputs['apellidos']) ? $inputs['apellidos'] : $usuario['apellidos'],
-            'correo_electronico' => isset($inputs['correo_electronico']) ? $inputs['correo_electronico'] : $usuario['correo_electronico'],
-            'celular' => isset($inputs['celular']) ? $inputs['celular'] : $usuario,
-            'fotografia' =>  isset($inputs['fotografia']) ? $inputs['fotografia'] : $usuario['fotografia'],
-            'contrasena' => isset($inputs['contrasena']) ? $inputs['contrasena'] : $usuario['contrasena'],
-            'rol_id' => isset($tipo_usuario) ? $tipo_usuario : $usuario['rol_id']
-        ]);
+        if (isset($usuario['tipo_usuario']))
+            $usuario_db['rol_id'] = $tipo_usuario;
+
+        $usuario_db->fill($usuario);
+        $usuario_db->save();
 
         return response()->json([
             'success' => true,
             'message' => 'Usuario actualizado con éxito',
-            'data' => $usuario
+            'data' => $usuario_db
         ], 200);
     }
 

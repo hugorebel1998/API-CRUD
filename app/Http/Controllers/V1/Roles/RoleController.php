@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RoleController extends Controller
 {
@@ -18,6 +19,11 @@ class RoleController extends Controller
      */
     public function listar(int $role = null)
     {
+        $user = Auth::user();
+
+        if (!in_array($user->role->nombre, ['Administrador', 'Basico']))
+            return response()->json(['success' => false, 'message' => 'No tienes los permisos necesarios'], 400);
+
         if (empty($role))
             return Role::all();
 
@@ -32,6 +38,11 @@ class RoleController extends Controller
      */
     public function crear(Request $request)
     {
+        $user = Auth::user();
+
+        if ($user->role->nombre !== 'Administrador')
+            return response()->json(['success' => false, 'message' => 'No tienes los permisos necesarios'], 400);
+
         $inputs = $this->validate($request, [
             'nombre' => 'required|unique:roles,nombre',
         ]);
@@ -57,23 +68,26 @@ class RoleController extends Controller
      */
     public function update(Request $request, $role_id)
     {
-        $role = Role::findOrFail($role_id);
+        $user = Auth::user();
 
-        $inputs = $this->validate($request, [
+        if ($user->role->nombre !== 'Administrador')
+            return response()->json(['success' => false, 'message' => 'No tienes los permisos necesarios'], 400);
+
+        $role_db = Role::findOrFail($role_id);
+
+        $role = $this->validate($request, [
             'nombre' => 'sometimes',
             'permission_id' => 'sometimes',
         ]);
 
 
-        $role->update([
-            'nombre' =>  isset($inputs['nombre']) ? $inputs['nombre'] : $role['nombre'],
-            'permission_id' => isset($inputs['permission_id']) ? $inputs['permission_id'] : $role['permission_id']
-        ]);
+        $role_db->fill($role);
+        $role_db->save();
 
         return response()->json([
             'success' => true,
             'message' => 'Rol actualizado con éxito',
-            'data' => $role
+            'data' => $role_db
         ], 200);
     }
 
@@ -86,9 +100,14 @@ class RoleController extends Controller
      */
     public function asignarPermiso(Request $request, $role_id)
     {
+        $user = Auth::user();
+
+        if ($user->role->nombre !== 'Administrador')
+            return response()->json(['success' => false, 'message' => 'No tienes los permisos necesarios'], 400);
+
         $role = Role::findOrFail($role_id);
 
-        // Obtener los permisos seleccionados desde la solicitud
+        // Obtener los permisos seleccionados
         $selectedPermissions = $request->input('permiso', []);
 
         // Obtener los modelos de permisos asociados a los nombres seleccionados
@@ -97,6 +116,6 @@ class RoleController extends Controller
         // Asignar permisos al rol
         $role->permissions()->attach($permissions);
 
-        return response()->json(['message' => 'Permisos asignados correctamente']);
+        return response()->json(['message' => 'Permiso asignados correctamente']);
     }
 }

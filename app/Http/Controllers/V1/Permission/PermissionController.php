@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1\Permission;
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PermissionController extends Controller
 {
@@ -17,6 +18,11 @@ class PermissionController extends Controller
      */
     public function listar(int $permiso_id = null)
     {
+        $user = Auth::user();
+
+        if ($user->role->nombre !== 'Administrador')
+            return response()->json(['success' => false, 'message' => 'No tienes los permisos necesarios'], 400);
+
         if (empty($permiso_id))
             return Permission::all();
 
@@ -31,6 +37,11 @@ class PermissionController extends Controller
      */
     public function crear(Request $request)
     {
+        $user = Auth::user();
+
+        if ($user->role->nombre !== 'Administrador')
+            return response()->json(['success' => false, 'message' => 'No tienes los permisos necesarios'], 400);
+
         $inputs = $this->validate($request, [
             'nombre' => 'required|unique:permissions,nombre',
         ]);
